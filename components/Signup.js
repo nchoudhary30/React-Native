@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
+import { EyeActive, Eye } from "../images";
 
 import {
   StyleSheet,
@@ -9,32 +10,90 @@ import {
   Button,
   TouchableOpacity,
   Pressable,
-} from 'react-native';
+} from "react-native";
 
 export default function Signup(props) {
-    const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [seePassword, setSeePassword] = useState(true);
+  const [checkValidEmail, setCheckValidEmail] = useState(false);
+  const [checkValidPassword, setCheckValidPassword] = useState('');
+
+  const handleCheckEmail = (text) => {
+    let re = /\S+@\S+\.\S+/;
+    let regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+
+    setEmail(text);
+    if (re.test(text) || regex.test(text)) {
+      setCheckValidEmail(false);
+    } else {
+      setCheckValidEmail(true);
+    }
+  };
+
+  const checkPasswordValidity = (value) => {
+    const isNonWhiteSpace = /^\S*$/;
+    if (value && !isNonWhiteSpace.test(value)) {
+      return "Password must not contain Whitespaces.";
+    }
+
+    const isContainsUppercase = /^(?=.*[A-Z]).*$/;
+    if (value && !isContainsUppercase.test(value)) {
+      return "Password must have at least one Uppercase Character.";
+    }
+
+    const isContainsLowercase = /^(?=.*[a-z]).*$/;
+    if (value && !isContainsLowercase.test(value)) {
+      return "Password must have at least one Lowercase Character.";
+    }
+
+    const isContainsNumber = /^(?=.*[0-9]).*$/;
+    if (value && !isContainsNumber.test(value)) {
+      return "Password must contain at least one Digit.";
+    }
+
+    const isValidLength = /^.{8,16}$/;
+    if (value && !isValidLength.test(value)) {
+      return "Password must be 8-16 Characters Long.";
+    }
+    return null;
+  };
+
+  const handleCheckPassword = (text) => {
+    setPassword(text);
+    setCheckValidPassword(checkPasswordValidity(text))
+  };
 
   return (
     <View style={styles.container}>
-        <Text style={styles.heading}>Sign Up</Text>
-        <View style={styles.inputView}>
+      <View style={styles.header}>
+        <Text>Todo App</Text>
+      </View>
+      <Text style={styles.heading}>Sign Up</Text>
+      <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
           placeholder="Name"
           placeholderTextColor="#003f5c"
-          onChangeText={name => setEmail(name)}
+          onChangeText={(name) => setName(name)}
         />
       </View>
 
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
+          type='email'
+          keyboardType="email-address"
           placeholder="Email"
           placeholderTextColor="#003f5c"
-          onChangeText={email => setEmail(email)}
+          onChangeText={(text) => handleCheckEmail(text)}
         />
+        {checkValidEmail ? (
+          <Text style={styles.textFailed}>Enter Valid Email Address</Text>
+        ) : (
+          <Text style={styles.textFailed}> </Text>
+        )}
       </View>
 
       <View style={styles.inputView}>
@@ -42,20 +101,32 @@ export default function Signup(props) {
           style={styles.TextInput}
           placeholder="Create Password"
           placeholderTextColor="#003f5c"
-          secureTextEntry={true}
-          onChangeText={password => setPassword(password)}
+          secureTextEntry={seePassword}
+          onChangeText={(password) => handleCheckPassword(password)}
         />
+        <TouchableOpacity
+          style={styles.wrapperIcon}
+          onPress={() => setSeePassword(!seePassword)}
+        >
+          <Image source={seePassword ? Eye : EyeActive} style={styles.icon} />
+        </TouchableOpacity>
+        {checkValidPassword?<Text>{checkValidPassword}</Text>:null}
       </View>
       <View style={styles.Signup}>
         <Text>Already a User?</Text>
         <TouchableOpacity>
-          <Pressable style={styles.pressable} onPress={()=>{props.setShow(!props.show)}}>
+          <Pressable
+            style={styles.pressable}
+            onPress={() => {
+              props.setShow(!props.show);
+            }}
+          >
             <Text>Login!</Text>
           </Pressable>
         </TouchableOpacity>
       </View>
 
-      <Button style={styles.Login} title="Signup"/>
+      <Button style={styles.Login} title="Signup" />
     </View>
   );
 }
@@ -63,44 +134,62 @@ export default function Signup(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopLeftRadius:30,
-    borderTopRightRadius:30
+    flexDirection: "column",
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
 
-  heading:{
-    flex:0.3,
-    fontSize:40
+
+  header: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  pressable:{
-    marginLeft:7,
-    borderRadius:4,
-    backgroundColor:'#CAEDEE'
+  heading: {
+    flex: 0.3,
+    fontSize: 40,
+  },
+
+  wrapperIcon: {
+    position: "absolute",
+    right: 0,
+    padding: 10,
+  },
+
+  icon: {
+    width: 25,
+    height: 20,
+  },
+
+  pressable: {
+    marginLeft: 7,
+    borderRadius: 4,
+    backgroundColor: "#CAEDEE",
   },
 
   Signup: {
     flex: 0.2,
-    flexDirection: 'row',
-    alignContent: 'space-between',
+    flexDirection: "row",
+    alignContent: "space-between",
     // justifyContent:'center'
   },
 
   Login: {
     flex: 1,
     // flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'center',
-    color:"#79A390"
+    alignContent: "center",
+    justifyContent: "center",
+    color: "#79A390",
   },
 
   inputView: {
-    borderRadius:10,
-    backgroundColor: '#b3b3cc',
-    width: '70%',
+    borderRadius: 10,
+    backgroundColor: "#b3b3cc",
+    width: "70%",
     height: 45,
     marginBottom: 20,
     // alignItems: 'center',

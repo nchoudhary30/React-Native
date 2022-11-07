@@ -22,5 +22,6 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      android:networkSecurityConfig="@xml/network_security_config"
     </application>
 </manifest>
